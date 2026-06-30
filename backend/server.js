@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv").config({ path: "../.env" });
 
 const express = require("express");
 const cors = require("cors");
@@ -17,6 +17,7 @@ app.get("/api/health", async (req, res) => {
       database: "connected",
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       status: "error",
       database: "disconnected",
