@@ -3,6 +3,10 @@ const pool = require("../db");
 
 const router = express.Router();
 
+function isValidListingId(id) {
+  return typeof id === "string" && id.trim().length > 0 && id.length <= 255;
+}
+
 router.get("/", async (req, res) => {
   try {
     const {
@@ -165,6 +169,64 @@ router.get("/", async (req, res) => {
     res.status(500).json({
       message: "Internal server error",
     });
+  }
+});
+
+router.get("/:id/openhouses", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!isValidListingId(id)) {
+      return res.status(400).json({ message: "Invalid listing ID" });
+    }
+
+    const [propertyRows] = await pool.query(
+      "SELECT L_ListingID FROM rets_property WHERE L_ListingID = ? LIMIT 1",
+      [id]
+    );
+
+    if (propertyRows.length === 0) {
+      return res.status(404).json({ message: "Property not found" });
+    }
+
+    const [openHouses] = await pool.query(
+      `
+      SELECT *
+      FROM rets_openhouse
+      WHERE L_ListingID = ?
+      ORDER BY OpenHouseDate ASC, OH_StartTime ASC
+      `,
+      [id]
+    );
+
+    res.json(openHouses);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+router.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!isValidListingId(id)) {
+      return res.status(400).json({ message: "Invalid listing ID" });
+    }
+
+    const [rows] = await pool.query(
+      "SELECT * FROM rets_property WHERE L_ListingID = ? LIMIT 1",
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Property not found" });
+    }
+
+    res.json(rows[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
