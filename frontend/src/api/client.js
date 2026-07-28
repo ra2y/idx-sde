@@ -1,31 +1,32 @@
-export async function fetchProperties(params = {}) {
+export async function fetchProperties(params = {}, options = {}) {
   const searchParams = new URLSearchParams();
 
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== "") {
-      searchParams.append(key, value);
+      searchParams.append(key, String(value));
     }
   });
 
   const queryString = searchParams.toString();
-
   const url = queryString
     ? `/api/properties?${queryString}`
     : "/api/properties";
 
-  const response = await fetch(url);
+  const response = await fetch(url, {
+    signal: options.signal,
+  });
 
   if (!response.ok) {
     let message = `Request failed with status ${response.status}`;
 
     try {
-      const errorBody = await response.json();
+      const body = await response.json();
 
-      if (errorBody.message) {
-        message = errorBody.message;
+      if (body.message) {
+        message = body.message;
       }
     } catch {
-      // Response was not JSON, so retain the default message.
+      // Keep the default error message.
     }
 
     throw new Error(message);

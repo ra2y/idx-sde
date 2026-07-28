@@ -1,0 +1,47 @@
+.property-filters {
+  margin-bottom: 32px;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #dddddd;
+  border-radius: 12px;
+}
+
+.property-filters__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 16px;
+}
+
+.property-filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.property-filters input,
+.property-filters select {
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 1px solid #aaaaaa;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.property-filters__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.property-filters__actions button {
+  padding: 10px 18px;
+  border: 1px solid #555555;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.property-filters__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

@@ -38,3 +38,8 @@
 .error-message h1 {
   margin-top: 0;
 }
+
+.active-filter-summary {
+  margin: -16px 0 24px;
+  color: #555555;
+}

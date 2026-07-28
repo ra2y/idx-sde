@@ -1,74 +1,76 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { fetchProperties } from "../api/client";
 import PropertyCard from "../components/PropertyCard";
+import PropertyFilters from "../components/PropertyFilters";
 import "./ListingsPage.css";
+
+const DEFAULT_LIMIT = 20;
 
 function ListingsPage() {
   const [properties, setProperties] = useState([]);
   const [total, setTotal] = useState(0);
+  const [activeFilters, setActiveFilters] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    let ignore = false;
+  const abortControllerRef = useRef(null);
 
-    async function loadProperties() {
-      try {
-        setLoading(true);
-        setError("");
-
-        const data = await fetchProperties({
-          limit: 20,
-          offset: 0,
-        });
-
-        if (!ignore) {
-          setProperties(
-            Array.isArray(data.results) ? data.results : []
-          );
-
-          setTotal(Number(data.total) || 0);
-        }
-      } catch (requestError) {
-        if (!ignore) {
-          setProperties([]);
-          setTotal(0);
-          setError(
-            requestError.message || "Unable to load properties."
-          );
-        }
-      } finally {
-        if (!ignore) {
-          setLoading(false);
-        }
-      }
+  async function loadProperties(filters = {}) {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
     }
 
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    try {
+      setLoading(true);
+      setError("");
+
+      const data = await fetchProperties(
+        {
+          ...filters,
+          limit: DEFAULT_LIMIT,
+          offset: 0,
+        },
+        {
+          signal: controller.signal,
+        }
+      );
+
+      setProperties(Array.isArray(data.results) ? data.results : []);
+      setTotal(Number(data.total) || 0);
+    } catch (requestError) {
+      if (requestError.name === "AbortError") {
+        return;
+      }
+
+      setProperties([]);
+      setTotal(0);
+      setError(requestError.message || "Unable to load properties.");
+    } finally {
+      if (abortControllerRef.current === controller) {
+        setLoading(false);
+      }
+    }
+  }
+
+  useEffect(() => {
     loadProperties();
 
     return () => {
-      ignore = true;
+      abortControllerRef.current?.abort();
     };
   }, []);
 
-  if (loading) {
-    return (
-      <main className="listings-page">
-        <p className="status-message">Loading properties...</p>
-      </main>
-    );
+  function handleSearch(filters) {
+    setActiveFilters(filters);
+    loadProperties(filters);
   }
 
-  if (error) {
-    return (
-      <main className="listings-page">
-        <section className="error-message">
-          <h1>Unable to load properties</h1>
-          <p>{error}</p>
-          <p>Make sure the Express server and MySQL container are running.</p>
-        </section>
-      </main>
-    );
+  function handleClear() {
+    setActiveFilters({});
+    loadProperties({});
   }
 
   return (
@@ -81,9 +83,39 @@ function ListingsPage() {
         </p>
       </header>
 
-      {properties.length === 0 ? (
-        <p className="status-message">No properties found.</p>
-      ) : (
+      <PropertyFilters
+        onSearch={handleSearch}
+        onClear={handleClear}
+        disabled={loading}
+      />
+
+      {Object.keys(activeFilters).length > 0 && (
+        <p className="active-filter-summary">
+          Active filters:{" "}
+          {Object.entries(activeFilters)
+            .map(([key, value]) => `${key}=${value}`)
+            .join(", ")}
+        </p>
+      )}
+
+      {loading && (
+        <p className="status-message">Loading properties...</p>
+      )}
+
+      {!loading && error && (
+        <section className="error-message">
+          <h2>Unable to load properties</h2>
+          <p>{error}</p>
+        </section>
+      )}
+
+      {!loading && !error && properties.length === 0 && (
+        <p className="status-message">
+          No properties matched your filters. Try broadening your search.
+        </p>
+      )}
+
+      {!loading && !error && properties.length > 0 && (
         <section className="property-grid">
           {properties.map((property) => (
             <PropertyCard
