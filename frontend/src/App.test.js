@@ -1,8 +1,36 @@
-import { render, screen } from '@testing-library/react';
-import App from './App';
+import { render, screen } from "@testing-library/react";
+import App from "./App";
+import { fetchProperties } from "./api/client";
 
-test('renders learn react link', () => {
+jest.mock("./api/client", () => ({
+  fetchProperties: jest.fn(),
+}));
+
+beforeEach(() => {
+  fetchProperties.mockResolvedValue({
+    total: 0,
+    limit: 20,
+    offset: 0,
+    results: [],
+  });
+});
+
+afterEach(() => {
+  jest.clearAllMocks();
+});
+
+test("renders the property listings page", async () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+
+  expect(
+    screen.getByRole("heading", {
+      name: /property listings/i,
+    })
+  ).toBeInTheDocument();
+
+  expect(
+    await screen.findByText(/no properties matched your filters/i)
+  ).toBeInTheDocument();
+
+  expect(fetchProperties).toHaveBeenCalled();
 });

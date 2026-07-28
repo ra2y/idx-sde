@@ -37,8 +37,9 @@ function ListingsPage() {
           signal: controller.signal,
         }
       );
-
-      setProperties(Array.isArray(data.results) ? data.results : []);
+      setProperties(
+        Array.isArray(data?.results) ? data.results : []
+      );
       setTotal(Number(data.total) || 0);
     } catch (requestError) {
       if (requestError.name === "AbortError") {
