@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { fetchProperties } from "../api/client";
 import PropertyCard from "../components/PropertyCard";
 import PropertyFilters from "../components/PropertyFilters";
+import Pagination from "../components/Pagination";
 import "./ListingsPage.css";
 
 const DEFAULT_LIMIT = 20;
@@ -15,6 +16,10 @@ function ListingsPage() {
 
   const abortControllerRef = useRef(null);
 
+  const ITEMS_PER_PAGE = 20;
+
+  const [currentPage, setCurrentPage] = useState(1);
+
   async function loadProperties(filters = {}) {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -27,11 +32,13 @@ function ListingsPage() {
       setLoading(true);
       setError("");
 
+      const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
       const data = await fetchProperties(
         {
           ...filters,
-          limit: DEFAULT_LIMIT,
-          offset: 0,
+          limit: ITEMS_PER_PAGE,
+          offset,
         },
         {
           signal: controller.signal,
@@ -40,7 +47,7 @@ function ListingsPage() {
       setProperties(
         Array.isArray(data?.results) ? data.results : []
       );
-      setTotal(Number(data.total) || 0);
+      setTotal(Number(data?.total) || 0);
     } catch (requestError) {
       if (requestError.name === "AbortError") {
         return;
@@ -57,22 +64,37 @@ function ListingsPage() {
   }
 
   useEffect(() => {
-    loadProperties();
+    loadProperties(activeFilters);
 
     return () => {
       abortControllerRef.current?.abort();
     };
-  }, []);
+  }, [currentPage, activeFilters]);
 
   function handleSearch(filters) {
+    setCurrentPage(1);
     setActiveFilters(filters);
-    loadProperties(filters);
   }
 
   function handleClear() {
+    setCurrentPage(1);
     setActiveFilters({});
-    loadProperties({});
   }
+
+  function handlePageChange(page) {
+    setCurrentPage(page);
+    window.scrollTo(0, 0);
+  }
+
+  const start =
+    total === 0
+      ? 0
+      : (currentPage - 1) * ITEMS_PER_PAGE + 1;
+
+  const end = Math.min(
+    currentPage * ITEMS_PER_PAGE,
+    total
+  );
 
   return (
     <main className="listings-page">
@@ -80,7 +102,7 @@ function ListingsPage() {
         <h1>Property Listings</h1>
 
         <p>
-          Showing {properties.length} of {total} properties
+          Showing {start}-{end} of {total} properties
         </p>
       </header>
 
@@ -125,6 +147,14 @@ function ListingsPage() {
             />
           ))}
         </section>
+      )}
+      {!loading && !error && (
+        <Pagination
+          currentPage={currentPage}
+          totalItems={total}
+          itemsPerPage={ITEMS_PER_PAGE}
+          onPageChange={handlePageChange}
+        />
       )}
     </main>
   );
