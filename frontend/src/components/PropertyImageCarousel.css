@@ -1,0 +1,41 @@
+.image-carousel {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+}
+
+.image-carousel img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 85%);
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.carousel-arrow--left {
+  left: 10px;
+}
+
+.carousel-arrow--right {
+  right: 10px;
+}
+
+.carousel-counter {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 4px 8px;
+  background: rgb(0 0 0 / 65%);
+  color: white;
+  border-radius: 5px;
+}

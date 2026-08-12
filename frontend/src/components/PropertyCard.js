@@ -1,37 +1,6 @@
+import { useNavigate } from "react-router-dom";
+import PropertyImageCarousel from "./PropertyImageCarousel";
 import "./PropertyCard.css";
-
-const FALLBACK_IMAGE =
-  "https://placehold.co/600x400?text=No+Property+Photo";
-
-function parsePhotos(value) {
-  if (!value) {
-    return [];
-  }
-
-  if (Array.isArray(value)) {
-    return value.filter(
-      (photo) => typeof photo === "string" && photo.trim() !== ""
-    );
-  }
-
-  if (typeof value !== "string") {
-    return [];
-  }
-
-  try {
-    const parsed = JSON.parse(value);
-
-    if (!Array.isArray(parsed)) {
-      return [];
-    }
-
-    return parsed.filter(
-      (photo) => typeof photo === "string" && photo.trim() !== ""
-    );
-  } catch {
-    return [];
-  }
-}
 
 function formatPrice(price) {
   const numericPrice = Number(price);
@@ -56,8 +25,7 @@ function displayStat(value, label) {
 }
 
 function PropertyCard({ property }) {
-  const photos = parsePhotos(property.L_Photos);
-  const firstPhoto = photos[0] || FALLBACK_IMAGE;
+  const navigate = useNavigate();
 
   const stats = [
     displayStat(property.L_Keyword2, "beds"),
@@ -74,15 +42,27 @@ function PropertyCard({ property }) {
     .filter(Boolean)
     .join(", ");
 
+  function openProperty() {
+    navigate(`/property/${property.L_ListingID}`);
+  }
+
+  function handleKeyDown(event) {
+    if (event.key === "Enter") {
+      openProperty();
+    }
+  }
+
   return (
-    <article className="property-card">
-      <img
-        className="property-card__image"
-        src={firstPhoto}
-        alt={address}
-        onError={(event) => {
-          event.currentTarget.src = FALLBACK_IMAGE;
-        }}
+    <article
+      className="property-card"
+      onClick={openProperty}
+      onKeyDown={handleKeyDown}
+      role="link"
+      tabIndex={0}
+    >
+      <PropertyImageCarousel
+        photosValue={property.L_Photos}
+        address={address}
       />
 
       <div className="property-card__body">

@@ -34,3 +34,49 @@ export async function fetchProperties(params = {}, options = {}) {
 
   return response.json();
 }
+export async function fetchPropertyDetail(id) {
+  const response = await fetch(
+    `/api/properties/${encodeURIComponent(id)}`
+  );
+
+  if (!response.ok) {
+    let message = "Unable to load property";
+
+    try {
+      const body = await response.json();
+
+      if (body.message) {
+        message = body.message;
+      }
+    } catch {
+      // Keep default message.
+    }
+
+    throw new Error(message);
+  }
+
+  return response.json();
+}
+export async function fetchOpenHouses(id) {
+  const response = await fetch(
+    `/api/properties/${encodeURIComponent(id)}/openhouses`
+  );
+
+  if (!response.ok) {
+    let message = "Unable to load open houses";
+
+    try {
+      const body = await response.json();
+
+      if (body.message) {
+        message = body.message;
+      }
+    } catch {
+      // Keep default message.
+    }
+
+    throw new Error(message);
+  }
+
+  return response.json();
+}
