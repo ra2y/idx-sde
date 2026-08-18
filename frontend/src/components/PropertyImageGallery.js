@@ -2,6 +2,14 @@ import { useState } from "react";
 import { parsePhotos } from "../utils/photos";
 import "./PropertyImageGallery.css";
 
+const FALLBACK_IMAGE =
+  "https://placehold.co/600x400?text=No+Photo";
+
+function handleImageError(event) {
+  event.currentTarget.onerror = null;
+  event.currentTarget.src = FALLBACK_IMAGE;
+}
+
 function PropertyImageGallery({ photosValue }) {
   const photos = parsePhotos(photosValue);
 
@@ -45,6 +53,7 @@ function PropertyImageGallery({ photosValue }) {
           className="gallery__main"
           src={photos[currentIndex]}
           alt={`Property ${currentIndex + 1}`}
+          onError={handleImageError}
           onClick={() => setLightboxOpen(true)}
         />
 
@@ -58,6 +67,7 @@ function PropertyImageGallery({ photosValue }) {
               <img
                 src={photo}
                 alt={`Thumbnail ${index + 1}`}
+                onError={handleImageError}
               />
             </button>
           ))}
@@ -97,6 +107,7 @@ function PropertyImageGallery({ photosValue }) {
           <img
             src={photos[currentIndex]}
             alt={`Property ${currentIndex + 1}`}
+            onError={handleImageError}
             onClick={(event) => event.stopPropagation()}
           />
 
