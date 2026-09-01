@@ -6,8 +6,6 @@ import Pagination from "../components/Pagination";
 import SortControls from "../components/SortControls";
 import "./ListingsPage.css";
 
-const DEFAULT_LIMIT = 20;
-
 function ListingsPage() {
   const [properties, setProperties] = useState([]);
   const [total, setTotal] = useState(0);

@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import PropertyImageCarousel from "./PropertyImageCarousel";
 import PropTypes from "prop-types";
-import { useNavigate } from "react-router-dom";
 import "./PropertyCard.css";
 
 function formatPrice(price) {
