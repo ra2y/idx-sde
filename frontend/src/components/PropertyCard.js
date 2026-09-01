@@ -24,7 +24,11 @@ function displayStat(value, label) {
   return `${value} ${label}`;
 }
 
-function PropertyCard({ property }) {
+function PropertyCard({ 
+  property,
+  isFavorite = false,
+  onToggleFavorite,
+}) {
   const navigate = useNavigate();
 
   const stats = [
@@ -52,6 +56,14 @@ function PropertyCard({ property }) {
     }
   }
 
+  function handleFavoriteClick(event) {
+    event.stopPropagation();
+
+    if (onToggleFavorite) {
+      onToggleFavorite(property)
+    }
+  }
+
   return (
     <article
       className="property-card"
@@ -60,17 +72,36 @@ function PropertyCard({ property }) {
       role="link"
       tabIndex={0}
     >
-      <PropertyImageCarousel
-        photosValue={property.L_Photos}
-        address={address}
-      />
+      <div className="property-card__image-wrapper">
+        <PropertyImageCarousel
+          photosValue={property.L_Photos}
+          address={address}
+        />
+
+        <button
+          type="button"
+          className={`favorite-button ${
+            isFavorite ? "favorite-button--active" : ""
+          }`}
+          onClick={handleFavoriteClick}
+          aria-label={
+            isFavorite
+              ? "Remove from favorites"
+              : "Add to favorites"
+          }
+        >
+          {isFavorite ? "♥" : "♡"}
+        </button>
+      </div>
 
       <div className="property-card__body">
         <h2 className="property-card__price">
           {formatPrice(property.L_SystemPrice)}
         </h2>
 
-        <p className="property-card__address">{address}</p>
+        <p className="property-card__address">
+          {address}
+        </p>
 
         <p className="property-card__location">
           {cityState || "Location unavailable"}

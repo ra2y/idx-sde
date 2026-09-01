@@ -3,6 +3,13 @@ const pool = require("../db");
 
 const router = express.Router();
 
+const ALLOWED_SORT_FIELDS = [
+  "L_SystemPrice",
+  "ListingContractDate",
+  "LM_Int2_3",
+  "L_Keyword2",
+];
+
 function isValidListingId(id) {
   return typeof id === "string" && id.trim().length > 0 && id.length <= 255;
 }
@@ -18,6 +25,8 @@ router.get("/", async (req, res) => {
       baths,
       limit = 20,
       offset = 0,
+      sortBy,
+      sortOrder,
     } = req.query;
 
     const parsedLimit = Number(limit);
@@ -44,6 +53,23 @@ router.get("/", async (req, res) => {
       });
     }
 
+    if (
+      sortBy &&
+      !ALLOWED_SORT_FIELDS.includes(sortBy)
+    ) {
+      return res.status(400).json({
+        message: "Invalid sortBy value",
+      });
+    }
+
+    if (
+      sortOrder &&
+      !["asc", "desc"].includes(sortOrder.toLowerCase())
+    ) {
+      return res.status(400).json({
+        message: "sortOrder must be asc or desc",
+      });
+    }
     const conditions = [];
     const values = [];
 
@@ -140,6 +166,17 @@ router.get("/", async (req, res) => {
 
     const whereClause =
       conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+    
+    let orderClause = "";
+
+    if (sortBy) {
+      const direction =
+        sortOrder?.toLowerCase() === "desc"
+          ? "DESC"
+          : "ASC";
+
+      orderClause = `ORDER BY ${sortBy} ${direction}`;
+    }
 
     const [countRows] = await pool.query(
       `SELECT COUNT(*) AS total FROM rets_property ${whereClause}`,
@@ -151,6 +188,7 @@ router.get("/", async (req, res) => {
       SELECT *
       FROM rets_property
       ${whereClause}
+      ${orderClause}
       LIMIT ?
       OFFSET ?
       `,

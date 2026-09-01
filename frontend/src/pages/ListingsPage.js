@@ -3,6 +3,7 @@ import { fetchProperties } from "../api/client";
 import PropertyCard from "../components/PropertyCard";
 import PropertyFilters from "../components/PropertyFilters";
 import Pagination from "../components/Pagination";
+import SortControls from "../components/SortControls";
 import "./ListingsPage.css";
 
 const DEFAULT_LIMIT = 20;
@@ -19,6 +20,9 @@ function ListingsPage() {
   const ITEMS_PER_PAGE = 20;
 
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [sortBy, setSortBy] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
 
   async function loadProperties(filters = {}) {
     if (abortControllerRef.current) {
@@ -39,6 +43,8 @@ function ListingsPage() {
           ...filters,
           limit: ITEMS_PER_PAGE,
           offset,
+          sortBy,
+          sortOrder,
         },
         {
           signal: controller.signal,
@@ -69,21 +75,31 @@ function ListingsPage() {
     return () => {
       abortControllerRef.current?.abort();
     };
-  }, [currentPage, activeFilters]);
+  }, [currentPage, activeFilters, sortBy, sortOrder]);
 
   function handleSearch(filters) {
     setCurrentPage(1);
+    setSortBy("");
+    setSortOrder("asc");
     setActiveFilters(filters);
   }
 
   function handleClear() {
     setCurrentPage(1);
+    setSortBy("");
+    setSortOrder("asc");
     setActiveFilters({});
   }
 
   function handlePageChange(page) {
     setCurrentPage(page);
     window.scrollTo(0, 0);
+  }
+
+  function handleSortChange(newSortBy, newSortOrder) {
+    setSortBy(newSortBy);
+    setSortOrder(newSortOrder);
+    setCurrentPage(1);
   }
 
   const start =
@@ -110,6 +126,12 @@ function ListingsPage() {
         onSearch={handleSearch}
         onClear={handleClear}
         disabled={loading}
+      />
+
+      <SortControls
+        sortBy={sortBy}
+        sortOrder={sortOrder}
+        onSortChange={handleSortChange}
       />
 
       {Object.keys(activeFilters).length > 0 && (
