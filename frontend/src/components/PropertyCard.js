@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import PropertyImageCarousel from "./PropertyImageCarousel";
-import PropTypes from "prop-types";
 import "./PropertyCard.css";
 
 function formatPrice(price) {
@@ -25,7 +24,7 @@ function displayStat(value, label) {
   return `${value} ${label}`;
 }
 
-function PropertyCard({ 
+function PropertyCard({
   property,
   isFavorite = false,
   onToggleFavorite,
@@ -43,7 +42,10 @@ function PropertyCard({
     property.L_AddressStreet ||
     "Address unavailable";
 
-  const cityState = [property.L_City, property.L_State]
+  const cityState = [
+    property.L_City,
+    property.L_State,
+  ]
     .filter(Boolean)
     .join(", ");
 
@@ -61,7 +63,7 @@ function PropertyCard({
     event.stopPropagation();
 
     if (onToggleFavorite) {
-      onToggleFavorite(property)
+      onToggleFavorite(property);
     }
   }
 
@@ -117,34 +119,5 @@ function PropertyCard({
     </article>
   );
 }
-
-PropertyCard.propTypes = {
-  property: PropTypes.shape({
-    id: PropTypes.number,
-    L_ListingID: PropTypes.string,
-    L_Address: PropTypes.string,
-    L_AddressStreet: PropTypes.string,
-    L_City: PropTypes.string,
-    L_State: PropTypes.string,
-    L_SystemPrice: PropTypes.oneOfType([
-      PropTypes.number,
-      PropTypes.string,
-    ]),
-    L_Keyword2: PropTypes.number,
-    LM_Dec_3: PropTypes.oneOfType([
-      PropTypes.number,
-      PropTypes.string,
-    ]),
-    LM_Int2_3: PropTypes.number,
-    L_Photos: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.arrayOf(PropTypes.string),
-    ]),
-  }).isRequired,
-
-  isFavorite: PropTypes.bool,
-
-  onToggleFavorite: PropTypes.func,
-};
 
 export default PropertyCard;

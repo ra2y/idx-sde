@@ -5,6 +5,8 @@ import PropertyFilters from "../components/PropertyFilters";
 import Pagination from "../components/Pagination";
 import SortControls from "../components/SortControls";
 import "./ListingsPage.css";
+import useFavorites from "../hooks/useFavorites";
+import { Link } from "react-router-dom";
 
 function ListingsPage() {
   const [properties, setProperties] = useState([]);
@@ -21,6 +23,12 @@ function ListingsPage() {
 
   const [sortBy, setSortBy] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
+
+  const {
+    favoritesCount,
+    isFavorite,
+    toggleFavorite,
+  } = useFavorites();
 
   async function loadProperties(filters = {}) {
     if (abortControllerRef.current) {
@@ -112,13 +120,17 @@ function ListingsPage() {
 
   return (
     <main className="listings-page">
-      <header className="listings-page__header">
-        <h1>Property Listings</h1>
+    <header className="listings-page__header">
+      <h1>Property Listings</h1>
 
-        <p>
-          Showing {start}-{end} of {total} properties
-        </p>
-      </header>
+      <p>
+        Showing {start}-{end} of {total} properties
+      </p>
+
+      <Link to="/favorites">
+        Favorites ({favoritesCount})
+      </Link>
+    </header>
 
       <PropertyFilters
         onSearch={handleSearch}
@@ -164,6 +176,8 @@ function ListingsPage() {
             <PropertyCard
               key={property.id || property.L_ListingID}
               property={property}
+              isFavorite={isFavorite(property.L_ListingID)}
+              onToggleFavorite={toggleFavorite}
             />
           ))}
         </section>
