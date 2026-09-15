@@ -8,6 +8,7 @@ import ListingsPage from "./pages/ListingsPage";
 import FavoritesPage from "./pages/FavoritesPage";
 import PropertyDetailPage from "./pages/PropertyDetailPage";
 import ErrorBoundary from "./components/ErrorBoundary";
+import OpenHouseCalendarPage from "./pages/OpenHouseCalendarPage";
 
 import "./App.css";
 

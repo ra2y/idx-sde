@@ -127,9 +127,15 @@ function ListingsPage() {
         Showing {start}-{end} of {total} properties
       </p>
 
-      <Link to="/favorites">
-        Favorites ({favoritesCount})
-      </Link>
+      <nav className="listings-nav">
+        <Link to="/favorites">
+          Favorites ({favoritesCount})
+        </Link>
+
+        <Link to="/openhouses">
+          Open House Calendar
+        </Link>
+      </nav>
     </header>
 
       <PropertyFilters

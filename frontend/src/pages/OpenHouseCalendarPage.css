@@ -1,0 +1,34 @@
+.openhouse-calendar-page {
+  width: min(1400px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 60px;
+}
+
+.openhouse-calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.openhouse-calendar-header h1 {
+  margin-bottom: 5px;
+}
+
+.openhouse-calendar-header p {
+  margin: 0;
+}
+
+.openhouse-calendar-header button {
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+.calendar-empty-message {
+  margin-bottom: 20px;
+  padding: 16px;
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+  background: #ffffff;
+}
