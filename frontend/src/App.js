@@ -31,6 +31,10 @@ function App() {
             path="/property/:id"
             element={<PropertyDetailPage />}
           />
+          <Route
+            path="/openhouses"
+            element={<OpenHouseCalendarPage />}
+          />
         </Routes>
       </BrowserRouter>
     </ErrorBoundary>

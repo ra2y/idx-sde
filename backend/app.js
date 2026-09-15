@@ -1,11 +1,13 @@
 const express = require("express");
 const cors = require("cors");
 const propertiesRouter = require("./routes/properties");
+const openhousesRouter = require("./routes/openhouses");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use("/api/openhouses", openhousesRouter);
 
 app.use((req, res, next) => {
   const start = Date.now();
