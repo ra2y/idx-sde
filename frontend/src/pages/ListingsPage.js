@@ -30,52 +30,52 @@ function ListingsPage() {
     toggleFavorite,
   } = useFavorites();
 
-  async function loadProperties(filters = {}) {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
-
-    try {
-      setLoading(true);
-      setError("");
-
-      const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-
-      const data = await fetchProperties(
-        {
-          ...filters,
-          limit: ITEMS_PER_PAGE,
-          offset,
-          sortBy,
-          sortOrder,
-        },
-        {
-          signal: controller.signal,
-        }
-      );
-      setProperties(
-        Array.isArray(data?.results) ? data.results : []
-      );
-      setTotal(Number(data?.total) || 0);
-    } catch (requestError) {
-      if (requestError.name === "AbortError") {
-        return;
-      }
-
-      setProperties([]);
-      setTotal(0);
-      setError(requestError.message || "Unable to load properties.");
-    } finally {
-      if (abortControllerRef.current === controller) {
-        setLoading(false);
-      }
-    }
-  }
 
   useEffect(() => {
+    async function loadProperties(filters = {}) {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
+      try {
+        setLoading(true);
+        setError("");
+
+        const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+        const data = await fetchProperties(
+          {
+            ...filters,
+            limit: ITEMS_PER_PAGE,
+            offset,
+            sortBy,
+            sortOrder,
+          },
+          {
+            signal: controller.signal,
+          }
+        );
+        setProperties(
+          Array.isArray(data?.results) ? data.results : []
+        );
+        setTotal(Number(data?.total) || 0);
+      } catch (requestError) {
+        if (requestError.name === "AbortError") {
+          return;
+        }
+
+        setProperties([]);
+        setTotal(0);
+        setError(requestError.message || "Unable to load properties.");
+      } finally {
+        if (abortControllerRef.current === controller) {
+          setLoading(false);
+        }
+      }
+    }
     loadProperties(activeFilters);
 
     return () => {

@@ -43,3 +43,9 @@
   margin: -16px 0 24px;
   color: #555555;
 }
+
+.listings-nav {
+  display: flex;
+  gap: 20px;
+  margin-top: 12px;
+}
